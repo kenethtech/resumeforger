@@ -6,6 +6,11 @@ dist/
 wheels/
 *.egg-info
 
+migrations
+instance
+resumeforger_db.db
+
 # Virtual environments
 .venv
 .env
+instance
