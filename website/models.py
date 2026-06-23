@@ -25,7 +25,7 @@ class Generation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     job_title = db.Column(db.String(50))
-    document_type = db.Colum(db.String(50))
+    document_type = db.Column(db.String(50))
     template_style = db.Column(db.String(50))
     content = db.Column(db.Text, nullable=False)
     ats_score = db.Column(db.Integer)
