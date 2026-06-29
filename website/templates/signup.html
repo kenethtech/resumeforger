@@ -3,6 +3,115 @@
 {% block title %}Sign Up{% endblock %}
 
 {% block content %}
-    <h1>Sign Up</h1>
-    <p>This is the sign-up page.</p>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-5">
+            <div class="card p-4" style="width: 100; max-width: 420px; margin: auto;">
+
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold text-primary">Resumeforger</h2>
+                    <p class="text-muted">Create a new account.</p>
+                </div>
+                <div class="mb-3">
+                    <label for="email1" class="form-label">Email address</label>
+                    <div class="input-group">
+                        <input type="email" class="form-control" id="email1" placeholder="Enter your email" required>
+                    </div>
+                </div>
+                <div class=" mb-3">
+                    <label for="password1" class="form-label">Password</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="password1" placeholder="Enter your password"
+                            required>
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="togglePassword" style="cursor: pointer;">
+                                <i class="fa fa-eye" id="toggleIcon"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="confirmPassword1" class="form-label">Confirm Password</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="confirmPassword1"
+                            placeholder="Confirm your password" required>
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="toggleConfirmPassword" style="cursor: pointer;">
+                                <i class="fa fa-eye" id="toggleConfirmIcon"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="signup()">Sign Up</button>
+                <p class="mt-3 text-center">
+                    I have an account? <a href="/login">Login</a>
+                </p>
+
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    const togglePassword = document.querySelector('#togglePassword');
+    const password1 = document.querySelector('#password1');
+    const toggleIcon = document.querySelector('#toggleIcon');
+    const toggleConfirmPassword = document.querySelector('#toggleConfirmPassword');
+    const confirmPassword1 = document.querySelector('#confirmPassword1');
+    const toggleConfirmIcon = document.querySelector('#toggleConfirmIcon');
+
+    togglePassword.addEventListener('click', function () {
+        const type = password1.getAttribute('type') === 'password' ? 'text' : 'password';
+        password1.setAttribute('type', type);
+        toggleIcon.classList.toggle('fa-eye');
+        toggleIcon.classList.toggle('fa-eye-slash');
+    });
+
+    toggleConfirmPassword.addEventListener('click', function () {
+        const type = confirmPassword1.getAttribute('type') === 'password' ? 'text' : 'password';
+        confirmPassword1.setAttribute('type', type);
+        toggleConfirmIcon.classList.toggle('fa-eye');
+        toggleConfirmIcon.classList.toggle('fa-eye-slash');
+    });
+
+
+    async function signup() {
+
+
+        const email = document.getElementById('email1').value;
+        const password = document.getElementById('password1').value;
+        const confirmPassword = document.getElementById('confirmPassword1').value;
+
+        if (!email || !password || !confirmPassword) {
+            alert('Please fill in all fields.');
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            alert('Passwords do not match.');
+            return;
+        }
+
+        if (password.length < 6) {
+            alert('Password must be at least 6 characters long.');
+            return;
+        }
+
+        const res = await fetch('/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password, confirmPassword })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+            alert('Sign-up successful: ' + (data.msg || 'Sign up successful! Please login to your account.'));
+            window.location.href = '/login';
+        } else {
+            alert('Sign up failed: ' + (data.error || 'Unknown error'));
+        }
+    }
+</script>
 {% endblock %}

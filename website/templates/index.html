@@ -3,6 +3,128 @@
 {% block title %}Home - My App{% endblock %}
 
 {% block content %}
-    <h1>Welcome to My App</h1>
-    <p>This is the home page.</p>
+    <div class="container py-5">
+        <div>
+            <h5>Welcome, <span class="fw-bold" id="user-email"></span></h5>
+        </div>
+        <h2 class="mb-4"> AI Resume and Cover builder</h2>
+        <div class="row">
+            <div class="col-lg-7">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h5 class="card-title">Job Details: </h5>
+
+                        <div class="mb-3">
+                            <label for="job_title">Job Title/Role: </label>
+                            <input type="text" id="job_title" class="form-control" placeholder="eg. Senior Developer">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="job_description">Job Description:</label>
+                            <textarea name="job_description" id="job_description" rows="8" class="form-control" placeholder="Paste the job description here..."></textarea>
+
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="experience">Your Background/Work Experience: </label>
+                            <textarea name="experience" id="experience" rows="5" class="form-control" placeholder="Your work experience ..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="document_type">Document Type: </label>
+                            <select name="document_type" id="document_type" class="form-select">
+                                <option value="Resume">Resume</option>
+                                <option value="Cover Letter">Cover Letter</option>
+                            </select>
+                        </div>
+                        
+                        <button onclick="generateDocument()" class="btn btn-primary w-100 py-3">
+                            <i class="fas fas-magic"></i> Generate with AI
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!--Preview-->
+            <div class="col-lg-5">
+                <div class="card shadow" id="result-card" style="display: none;">
+                    <div class="card-hearder" d-flex justify-content-between>
+                        <span id="result-title">Generated Document</span>
+                        <button onclick="copyResult()" class="btn btn-sm btn-outline-primary">Copy</button>
+                    </div>
+                    <div class="card-body">
+                        <pre id="result-content" style="max-height: 70vh; overflow-y:auto;"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script>
+        async function getUserProfile() {
+            try{
+                const res = await authFetch('/get-user');
+
+                if (res.status == 401){
+                    window.location.href = '/login';
+                }
+
+                const user = await res.json();
+                if(!res.ok){
+                    alert(user.error || 'An error occured while fetching user profile');
+                    return;
+                }
+                document.getElementById('user-email').textContent = user.email;
+
+            }catch (e){
+                console.error(e);
+            }
+            
+        }
+
+        async function generateDocument() {
+            try{
+                const payload = {
+                    job_title: document.getElementById('job_title').value,
+                    job_description: document.getElementById('job_description').value,
+                    experience: document.getElementById('experience').value,
+                    document_type: document.getElementById('document_type').value
+                };
+
+                if (!payload.job_title || !payload.job_description || !payload.experience || !payload.document_type){
+                    alert('Please fill all the fields');
+                    return;
+                }
+
+                const res = await authFetch('/generate', {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.JSON();
+
+                if (res.ok){
+                    document.getElementById('result-content').textContent = data.content;
+                    document.getElementById('result-title').textContent = `${data.document_type} for ${data.job_title}`
+                    document.getElementById('result-card').style.display = 'block';
+                }else{
+                    alert(data.error || "Generation failed!");
+                    return;
+                }
+
+            }catch (e){
+                console.error(e);
+            }
+            
+        }
+        function copyResult(){
+            navigator.clipboard.writeText(document.getElementById('result-content').textContent);
+            alert('Result copied to Clipboard!')
+
+        }
+        
+
+        window.onload = () =>{
+            getUserProfile();
+        };
+    </script>
 {% endblock %}

@@ -6,6 +6,7 @@ from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from flask_caching import Cache
 from .config import Config
+from flask_login import LoginManager
 
 
 db = SQLAlchemy()
@@ -34,6 +35,18 @@ def create_app(config_class=Config):
 
     with app.app_context():
         db.create_all()
+
+    
+    #Login Manager
+    login_manager = LoginManager()
+    login_manager.login_view = 'views.login_page' #the redirect for @login_required
+    login_manager.init_app(app)
+
+    import website.models as model
+    @login_manager.user_loader
+    def load_user(user_id):
+        return model.User.query.get(int(user_id))
+
     
 
     return app
