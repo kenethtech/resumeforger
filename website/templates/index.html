@@ -3,6 +3,20 @@
 {% block title %}Home - My App{% endblock %}
 
 {% block content %}
+<style>
+    .loading-overlay {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+    .d-none {
+        display: none !important;
+    }
+</style>
     <div class="container py-5">
         <div>
             <h5>Welcome, <span class="fw-bold" id="user-email"></span></h5>
@@ -38,8 +52,8 @@
                             </select>
                         </div>
                         
-                        <button onclick="generateDocument()" class="btn btn-primary w-100 py-3">
-                            <i class="fas fas-magic"></i> Generate with AI
+                        <button onclick="generateDocument()" class="btn btn-primary w-100 py-3" id="generate-btn">
+                            <i class="fas fa-magic"></i> Generate with AI
                         </button>
                     </div>
                 </div>
@@ -50,10 +64,21 @@
                     <div class="card-hearder" d-flex justify-content-between>
                         <span id="result-title">Generated Document</span>
                         <button onclick="copyResult()" class="btn btn-sm btn-outline-primary">Copy</button>
+                        <button onclick="exportPdf()" class="btn btn-sm btn-outline-success" id="download-btn">
+                            <i class="fas fa-download"></i> Download PDF
+                        </button>
                     </div>
                     <div class="card-body">
                         <pre id="result-content" style="max-height: 70vh; overflow-y:auto;"></pre>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="loading-overlay d-none">
+            <div class="text-center">
+                <div class="spinner-border text-light" role="status">
+                    <h5 class="mt-3 text-black" id="loading-text">Generating document...</h5>
                 </div>
             </div>
         </div>
@@ -83,6 +108,8 @@
 
         async function generateDocument() {
             try{
+                
+
                 const payload = {
                     job_title: document.getElementById('job_title').value,
                     job_description: document.getElementById('job_description').value,
@@ -95,31 +122,112 @@
                     return;
                 }
 
+                const generateBtn = document.getElementById('generate-btn');
+                generateBtn.disabled = true;
+
+                generateBtn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Generating...`;
+
+                showLoading('Generating your document...');
+
                 const res = await authFetch('/generate', {
                     method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(payload)
                 });
 
-                const data = await res.JSON();
+                const data = await res.json();
 
                 if (res.ok){
                     document.getElementById('result-content').textContent = data.content;
                     document.getElementById('result-title').textContent = `${data.document_type} for ${data.job_title}`
                     document.getElementById('result-card').style.display = 'block';
+
+                    generateBtn.disabled = false;
+                    generateBtn.innerHTML = `<i class="fas fa-magic"></i> Generate with AI`;
+                    hideLoading();
+
                 }else{
+                    generateBtn.disabled = false;
+                    generateBtn.innerHTML = `<i class="fas fa-magic"></i> Generate with AI`;
+                    hideLoading();
+
                     alert(data.error || "Generation failed!");
                     return;
                 }
 
-            }catch (e){
-                console.error(e);
+            }finally{
+                const generateBtn = document.getElementById('generate-btn');
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = `<i class="fas fa-magic"></i> Generate with AI`;
+                hideLoading();
             }
             
         }
+        async function exportPdf(){
+
+            const content = document.getElementById('result-content').textContent;
+            const job_title = document.getElementById('job_title').value;
+            const document_type = document.getElementById('document_type').value;
+
+            if (!content || !job_title || !document_type){
+
+                alert('Please generate the document first!');
+                return;
+            }
+
+            const downloadBtn = document.getElementById('download-btn');
+            downloadBtn.disabled = true;
+
+            downloadBtn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Preparing PDF...`;
+
+            showLoading('Downloading PDF...');
+
+            const res = await authFetch('/export-pdf', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    content: content,
+                    job_title: job_title,
+                    document_type: document_type
+                })
+
+            });
+
+            if (res.ok){
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${document_type.toLowerCase()}_${job_title.replace(/\s+/g, "_")}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+
+                downloadBtn.disabled = false;
+                downloadBtn.innerHTML = `<i class="fas fa-download"></i> Download PDF`;
+                hideLoading();
+            }else{
+                const data = await res.json();
+                downloadBtn.disabled = false;
+                downloadBtn.innerHTML = `<i class="fas fa-download"></i> Download PDF`;
+                hideLoading();
+                alert(data.error || "Failed to export PDF!");
+            }
+            
+        }
+
+
         function copyResult(){
             navigator.clipboard.writeText(document.getElementById('result-content').textContent);
             alert('Result copied to Clipboard!')
 
+        }
+        function showLoading(message){
+            document.getElementById('loading-text').textContent = message;
+            document.getElementById('loading-overlay').classList.remove('d-none');
+        }
+        function hideLoading(){
+            document.getElementById('loading-overlay').classList.add('d-none');
         }
         
 

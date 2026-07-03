@@ -20,6 +20,7 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
+RUN pip playwright install --with-deps chromium
 
 # Copy project files
 COPY . .

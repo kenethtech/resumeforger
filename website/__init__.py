@@ -28,9 +28,11 @@ def create_app(config_class=Config):
 
     from .views import views
     from .auth import auth
+    from .agent import agent
 
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
+    app.register_blueprint(agent, url_prefix='/')
 
 
     with app.app_context():
