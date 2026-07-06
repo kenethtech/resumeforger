@@ -13,226 +13,296 @@
         align-items: center;
         z-index: 9999;
     }
+
     .d-none {
         display: none !important;
     }
 </style>
-    <div class="container py-5">
-        <div>
-            <h5>Welcome, <span class="fw-bold" id="user-email"></span></h5>
-        </div>
-        <h2 class="mb-4"> AI Resume and Cover builder</h2>
-        <div class="row">
-            <div class="col-lg-7">
-                <div class="card shadow">
-                    <div class="card-body">
-                        <h5 class="card-title">Job Details: </h5>
+<div class="container py-5">
+    <div>
+        <h5>Welcome, <span class="fw-bold" id="user-email"></span></h5>
+    </div>
+    <h2 class="mb-4"> AI Resume and Cover builder</h2>
+    <div class="row">
+        <div class="col-lg-7">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Job Details: </h5>
 
-                        <div class="mb-3">
-                            <label for="job_title">Job Title/Role: </label>
-                            <input type="text" id="job_title" class="form-control" placeholder="eg. Senior Developer">
-                        </div>
+                    <div class="mb-3">
+                        <label for="job_title">Job Title/Role: </label>
+                        <input type="text" id="job_title" class="form-control" placeholder="eg. Senior Developer">
+                    </div>
 
-                        <div class="mb-3">
-                            <label for="job_description">Job Description:</label>
-                            <textarea name="job_description" id="job_description" rows="8" class="form-control" placeholder="Paste the job description here..."></textarea>
+                    <div class="mb-3">
+                        <label for="full_name">Full Name: </label>
+                        <input type="text" id="full_name" class="form-control" placeholder="eg. John Doe">
+                    </div>
 
-                        </div>
+                    <div class="mb-3">
+                        <label for="email">Email: </label>
+                        <input type="email" id="email" class="form-control"
+                            placeholder="eg. senior.developer@example.com" required>
+                    </div>
 
-                        <div class="mb-3">
-                            <label for="experience">Your Background/Work Experience: </label>
-                            <textarea name="experience" id="experience" rows="5" class="form-control" placeholder="Your work experience ..."></textarea>
-                        </div>
+                    <div class="mb-3">
+                        <label for="phone_number">Phone Number: </label>
+                        <input type="text" id="phone_number" class="form-control" placeholder="eg. +1 (555) 123-4567"
+                            required>
+                    </div>
 
-                        <div class="mb-3">
+                    <div class="mb-3">
+                        <label for="job_description">Job Description:</label>
+                        <textarea name="job_description" id="job_description" rows="8" class="form-control"
+                            placeholder="Paste the job description here..."></textarea>
+
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="education">Education Background:</label>
+                        <textarea name="education" id="education" rows="5" class="form-control"
+                            placeholder="Paste your education details here..."></textarea>
+
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="experience">Your Background/Work Experience: </label>
+                        <textarea name="experience" id="experience" rows="5" class="form-control"
+                            placeholder="Your work experience ..."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="certifications">Certifications: </label>
+                        <textarea name="certifications" id="certifications" rows="3" class="form-control"
+                            placeholder="List your certifications here/Optional..."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="referees">Referees: </label>
+                        <textarea name="referees" id="referees" rows="3" class="form-control"
+                            placeholder="List your referees here/Optional..."></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
                             <label for="document_type">Document Type: </label>
                             <select name="document_type" id="document_type" class="form-select">
                                 <option value="Resume">Resume</option>
                                 <option value="Cover Letter">Cover Letter</option>
                             </select>
                         </div>
-                        
-                        <button onclick="generateDocument()" class="btn btn-primary w-100 py-3" id="generate-btn">
-                            <i class="fas fa-magic"></i> Generate with AI
-                        </button>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="template_style">Template Style: </label>
+                            <select name="template_style" id="template_style" class="form-select">
+                                <option value="Professional">Professional</option>
+                                <option value="Creative">Creative</option>
+                                <option value="Modern">Modern</option>
+                                <option value="Classic">Classic</option>
+                                <option value="Executive">Executive</option>
+                                <option value="Minimalist">Minimalist</option>
+                                <option value="Technical">Technical</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <!--Preview-->
-            <div class="col-lg-5">
-                <div class="card shadow" id="result-card" style="display: none;">
-                    <div class="card-hearder" d-flex justify-content-between>
-                        <span id="result-title">Generated Document</span>
-                        <button onclick="copyResult()" class="btn btn-sm btn-outline-primary">Copy</button>
-                        <button onclick="exportPdf()" class="btn btn-sm btn-outline-success" id="download-btn">
-                            <i class="fas fa-download"></i> Download PDF
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <pre id="result-content" style="max-height: 70vh; overflow-y:auto;"></pre>
-                    </div>
+
+
+                    <button onclick="generateDocument()" class="btn btn-primary w-100 py-3" id="generate-btn">
+                        <i class="fa fa-magic"></i> Generate with AI
+                    </button>
                 </div>
             </div>
         </div>
-
-        <div class="loading-overlay d-none">
-            <div class="text-center">
-                <div class="spinner-border text-light" role="status">
-                    <h5 class="mt-3 text-black" id="loading-text">Generating document...</h5>
+        <!--Preview-->
+        <div class="col-lg-5">
+            <div class="card shadow" id="result-card" style="display: none;">
+                <div class="card-header d-flex justify-content-between">
+                    <span id="result-title">Generated Document</span>
+                    <button onclick="copyResult()" class="btn btn-sm btn-outline-primary">Copy</button>
+                    <button onclick="exportPdf()" class="btn btn-sm btn-outline-success" id="download-btn">
+                        <i class="fa fa-download"></i> Download PDF
+                    </button>
+                </div>
+                <div class="card-body">
+                    <pre id="result-content" style="max-height: 70vh; overflow-y:auto;"></pre>
                 </div>
             </div>
         </div>
-
     </div>
-    <script>
-        async function getUserProfile() {
-            try{
-                const res = await authFetch('/get-user');
 
-                if (res.status == 401){
-                    window.location.href = '/login';
-                }
+    <!-- Loading Overlay-->
+    <div id="loading-overlay" class="loading-overlay d-none">
+        <div class="text-center">
+            <div class="spinner-border text-light" role="status"></div>
+            <h5 class="mt-3 text-black" id="loading-text">Generating document...</h5>
 
-                const user = await res.json();
-                if(!res.ok){
-                    alert(user.error || 'An error occured while fetching user profile');
-                    return;
-                }
-                document.getElementById('user-email').textContent = user.email;
+        </div>
+    </div>
 
-            }catch (e){
-                console.error(e);
+</div>
+<script>
+    async function getUserProfile() {
+        try {
+            const res = await authFetch('/get-user');
+
+            if (res.status == 401) {
+                window.location.href = '/login';
             }
-            
+
+            const user = await res.json();
+            if (!res.ok) {
+                alert(user.error || 'An error occured while fetching user profile');
+                return;
+            }
+            document.getElementById('user-email').textContent = user.email;
+
+        } catch (e) {
+            console.error(e);
         }
 
-        async function generateDocument() {
-            try{
-                
+    }
 
-                const payload = {
-                    job_title: document.getElementById('job_title').value,
-                    job_description: document.getElementById('job_description').value,
-                    experience: document.getElementById('experience').value,
-                    document_type: document.getElementById('document_type').value
-                };
+    async function generateDocument() {
+        try {
 
-                if (!payload.job_title || !payload.job_description || !payload.experience || !payload.document_type){
-                    alert('Please fill all the fields');
-                    return;
-                }
 
-                const generateBtn = document.getElementById('generate-btn');
-                generateBtn.disabled = true;
+            const payload = {
+                job_title: document.getElementById('job_title').value,
+                full_name: document.getElementById('full_name').value,
+                email: document.getElementById('email').value,
+                phone_number: document.getElementById('phone_number').value,
+                job_description: document.getElementById('job_description').value,
+                education: document.getElementById('education').value,
+                experience: document.getElementById('experience').value,
+                document_type: document.getElementById('document_type').value,
+                referees: document.getElementById('referees').value,
+                certifications: document.getElementById('certifications').value,
+                template_style: document.getElementById('template_style').value
+            };
 
-                generateBtn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Generating...`;
-
-                showLoading('Generating your document...');
-
-                const res = await authFetch('/generate', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(payload)
-                });
-
-                const data = await res.json();
-
-                if (res.ok){
-                    document.getElementById('result-content').textContent = data.content;
-                    document.getElementById('result-title').textContent = `${data.document_type} for ${data.job_title}`
-                    document.getElementById('result-card').style.display = 'block';
-
-                    generateBtn.disabled = false;
-                    generateBtn.innerHTML = `<i class="fas fa-magic"></i> Generate with AI`;
-                    hideLoading();
-
-                }else{
-                    generateBtn.disabled = false;
-                    generateBtn.innerHTML = `<i class="fas fa-magic"></i> Generate with AI`;
-                    hideLoading();
-
-                    alert(data.error || "Generation failed!");
-                    return;
-                }
-
-            }finally{
-                const generateBtn = document.getElementById('generate-btn');
-                generateBtn.disabled = false;
-                generateBtn.innerHTML = `<i class="fas fa-magic"></i> Generate with AI`;
-                hideLoading();
-            }
-            
-        }
-        async function exportPdf(){
-
-            const content = document.getElementById('result-content').textContent;
-            const job_title = document.getElementById('job_title').value;
-            const document_type = document.getElementById('document_type').value;
-
-            if (!content || !job_title || !document_type){
-
-                alert('Please generate the document first!');
+            if (!payload.job_title || !payload.full_name || !payload.email || !payload.phone_number || !payload.job_description || !payload.education || !payload.experience || !payload.document_type || !payload.template_style) {
+                alert('Please fill all the fields');
                 return;
             }
 
-            const downloadBtn = document.getElementById('download-btn');
-            downloadBtn.disabled = true;
+            const generateBtn = document.getElementById('generate-btn');
+            generateBtn.disabled = true;
 
-            downloadBtn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Preparing PDF...`;
+            generateBtn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Generating...`;
 
-            showLoading('Downloading PDF...');
+            showLoading('Generating your document...');
 
-            const res = await authFetch('/export-pdf', {
+            const res = await authFetch('/generate', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    content: content,
-                    job_title: job_title,
-                    document_type: document_type
-                })
-
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
             });
 
-            if (res.ok){
-                const blob = await res.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${document_type.toLowerCase()}_${job_title.replace(/\s+/g, "_")}.pdf`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
+            const data = await res.json();
 
-                downloadBtn.disabled = false;
-                downloadBtn.innerHTML = `<i class="fas fa-download"></i> Download PDF`;
+            if (res.ok) {
+                document.getElementById('result-content').textContent = data.content;
+                document.getElementById('result-title').textContent = `${data.document_type} - ${data.job_title} (${data.template_style} Style)`;
+                document.getElementById('result-card').style.display = 'block';
+
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = `<i class="fa fa-magic"></i> Generate with AI`;
                 hideLoading();
-            }else{
-                const data = await res.json();
-                downloadBtn.disabled = false;
-                downloadBtn.innerHTML = `<i class="fas fa-download"></i> Download PDF`;
+
+            } else {
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = `<i class="fa fa-magic"></i> Generate with AI`;
                 hideLoading();
-                alert(data.error || "Failed to export PDF!");
+
+                alert(data.error || "Generation failed!");
+                return;
             }
-            
+
+        } catch (e) {
+
+            console.error(e);
+            alert("Something went wrong.");
+
+        } finally {
+            const generateBtn = document.getElementById('generate-btn');
+            generateBtn.disabled = false;
+            generateBtn.innerHTML = `<i class="fa fa-magic"></i> Generate with AI`;
+            hideLoading();
         }
 
+    }
+    async function exportPdf() {
 
-        function copyResult(){
-            navigator.clipboard.writeText(document.getElementById('result-content').textContent);
-            alert('Result copied to Clipboard!')
+        const content = document.getElementById('result-content').textContent;
+        const job_title = document.getElementById('job_title').value;
+        const document_type = document.getElementById('document_type').value;
+        const template_style = document.getElementById('template_style').value;
 
-        }
-        function showLoading(message){
-            document.getElementById('loading-text').textContent = message;
-            document.getElementById('loading-overlay').classList.remove('d-none');
-        }
-        function hideLoading(){
-            document.getElementById('loading-overlay').classList.add('d-none');
-        }
-        
+        if (!content || !job_title || !document_type || !template_style) {
 
-        window.onload = () =>{
-            getUserProfile();
-        };
-    </script>
+            alert('Please generate the document first!');
+            return;
+        }
+
+        const downloadBtn = document.getElementById('download-btn');
+        downloadBtn.disabled = true;
+
+        downloadBtn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Preparing PDF...`;
+
+        showLoading('Downloading PDF...');
+
+        const res = await authFetch('/export-pdf', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                content: content,
+                job_title: job_title,
+                document_type: document_type,
+                template_style: template_style
+            })
+
+        });
+
+        if (res.ok) {
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${document_type.toLowerCase()}_${job_title.replace(/\s+/g, "_")}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+
+            downloadBtn.disabled = false;
+            downloadBtn.innerHTML = `<i class="fa fa-download"></i> Download PDF`;
+            hideLoading();
+        } else {
+            const data = await res.json();
+            downloadBtn.disabled = false;
+            downloadBtn.innerHTML = `<i class="fa fa-download"></i> Download PDF`;
+            hideLoading();
+            alert(data.error || "Failed to export PDF!");
+        }
+
+    }
+
+
+    function copyResult() {
+        navigator.clipboard.writeText(document.getElementById('result-content').textContent);
+        alert('Result copied to Clipboard!')
+
+    }
+    function showLoading(message) {
+        document.getElementById('loading-text').textContent = message;
+        document.getElementById('loading-overlay').classList.remove('d-none');
+    }
+    function hideLoading() {
+        document.getElementById('loading-overlay').classList.add('d-none');
+    }
+
+
+    window.onload = () => {
+        getUserProfile();
+    };
+</script>
 {% endblock %}

@@ -5,8 +5,11 @@ export_pdf_template ="""
         <meta charset="UTF-8">
         <title>{{document_type}} - {{job_title}}</title>
         <style>
-            body { font-family: 'Helvetica', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 40px auto; padding: 20px; }
-            h1, h2 { color: #1e3a8a; }
+            body { max-width: 800px; margin: 0px auto; padding: 20px; {{selected_css}} }
+            h1 { font-size: 26px; margin-bottom: 5px; }
+            h2 { font-size: 18px; margin-top: 25px; }
+            ul { padding-left: 20px; }
+            li { margin-bottom: 8px; }
             .header { text-align: center; margin-bottom: 30px; }
             .content { font-size: 11pt; }
         </style>
