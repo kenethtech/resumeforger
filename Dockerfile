@@ -20,7 +20,7 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
-RUN pip playwright install chromium
+RUN python -m playwright install chromium
 
 # Copy project files
 COPY . .
