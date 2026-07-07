@@ -7,7 +7,7 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from .config import Config
 from .models import Generation
-from . import db
+from . import db, limiter
 from website.templates.agent.export_pdf import (export_pdf_template)
 from .generate_pdf import generate_pdf
 import markdown
@@ -17,6 +17,7 @@ import markdown
 agent = Blueprint('agent', __name__)
 
 @agent.route('/generate', methods=['POST'])
+@limiter.limit("5 per minute")  # Limit to 5 requests per minute
 @jwt_required()
 @login_required
 def generate_content():
@@ -121,6 +122,7 @@ def generate_content():
 
 
 @agent.route('/export-pdf', methods=['POST'])
+@limiter.limit("2 per minute") # Limit to 2 requests per minute
 @jwt_required()
 @login_required
 def export_pdf():

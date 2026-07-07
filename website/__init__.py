@@ -1,4 +1,6 @@
 
+from dotenv import load_dotenv
+import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -7,13 +9,21 @@ from flask_cors import CORS
 from flask_caching import Cache
 from .config import Config
 from flask_login import LoginManager
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
+load_dotenv()  # Load environment variables from .env file
 
 db = SQLAlchemy()
 migrate = Migrate()
 cors = CORS(supports_credentials=True)
 jwt = JWTManager()
 cache = Cache()
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri=os.getenv("REDIS_URL")
+)
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -25,6 +35,7 @@ def create_app(config_class=Config):
     cors.init_app(app)
     jwt.init_app(app)
     cache.init_app(app)
+    limiter.init_app(app)
 
     from .views import views
     from .auth import auth

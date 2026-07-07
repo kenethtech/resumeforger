@@ -3,13 +3,14 @@ from flask_jwt_extended import create_access_token, create_refresh_token, jwt_re
 from .models import User
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime, timedelta
-from . import db
-from flask_login import login_user
+from . import db, limiter
+from flask_login import login_required, login_user, logout_user
 
 auth = Blueprint('auth', __name__)
 
 
 @auth.route('/token', methods=['POST'])
+@limiter.limit("3 per minute")
 def login():
     try:
         data = request.get_json()
@@ -38,6 +39,7 @@ def login():
         return jsonify({'error': str(e)}),500
 
 @auth.route('/register', methods=['POST'])
+@limiter.limit("3 per minute")
 def register():
     try:
         
@@ -98,4 +100,15 @@ def get_user():
        return jsonify({
            'error': str(e)
        }), 500
+   
+@auth.route('/logout')
+@jwt_required()
+@login_required
+def logout():
+    logout_user()
+    response = jsonify({
+        "msg": "Logout Successful!"
+    })
+    unset_jwt_cookies(response)
+    return response, 200
 
