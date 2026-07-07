@@ -17,6 +17,26 @@
     .d-none {
         display: none !important;
     }
+    .template-preview{
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 15px;
+        min-height: 180px;
+        background: white;
+        margin-bottom: 7px;
+    }
+    .template-preview.active{
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        margin-bottom: 7px;
+    }
+    pre { 
+        background: #f8f9fa; 
+        padding: 20px; 
+        border-radius: 10px; 
+        white-space: pre-wrap; 
+        line-height: 1.6; 
+        }
 </style>
 <div class="container py-5">
     <div>
@@ -94,7 +114,7 @@
 
                         <div class="col-md-6 mb-3">
                             <label for="template_style">Template Style: </label>
-                            <select name="template_style" id="template_style" class="form-select">
+                            <select name="template_style" id="template_style" class="form-select" onchange="updatePreview()">
                                 <option value="Professional">Professional</option>
                                 <option value="Creative">Creative</option>
                                 <option value="Modern">Modern</option>
@@ -105,6 +125,11 @@
                             </select>
                         </div>
                     </div>
+                    <!-- Preview Template-->
+                     <div class="mt-4">
+                        <label for="preview-box" class="form-label">Resume Template Preview: </label>
+                        <div id="preview-box" class="template-preview"></div>
+                     </div>
 
 
                     <button onclick="generateDocument()" class="btn btn-primary w-100 py-3" id="generate-btn">
@@ -113,7 +138,7 @@
                 </div>
             </div>
         </div>
-        <!--Preview-->
+        <!--Generated Result-->
         <div class="col-lg-5">
             <div class="card shadow" id="result-card" style="display: none;">
                 <div class="card-header d-flex justify-content-between">
@@ -141,6 +166,35 @@
 
 </div>
 <script>
+    const templateDescriptions = {
+      "Professional": "Clean, traditional layout with clear sections",
+      "Modern": "Fresh design with subtle accents and good spacing",
+      "Executive": "Sophisticated and authoritative look",
+      "Creative": "Bold, artistic style for creative roles",
+      "Minimalist": "Ultra-clean with maximum white space",
+      "Technical": "Code-friendly, structured for tech roles",
+      "Compact": "Dense but readable - great for many experiences",
+      "Bold": "Strong visual hierarchy and impact"
+    };
+
+    function updatePreview(){
+        const style = document.getElementById('template_style').value;
+        const previewBox = document.getElementById('preview-box');
+
+        previewBox.innerHTML = `
+        <strong>${style} Style</strong><br>
+        <small class="text-muted">${templateDescriptions[style]}</small>
+        <hr>
+        <div style="font-size: 0.9rem; opacity: 0.8;">
+          [Your Name]<br>
+          [Contact Info] | [LinkedIn] | [Portfolio]<br><br>
+          <strong>EXPERIENCE</strong><br>
+          • Achievement 1<br>
+          • Achievement 2
+        </div>
+      `;
+    }
+
     async function getUserProfile() {
         try {
             const res = await authFetch('/get-user');
