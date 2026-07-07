@@ -26,3 +26,9 @@ def about():
 @views.route("/contact")
 def contact():
     return render_template("contact.html", user=current_user)
+
+@views.route('/subscribe')
+@login_required
+@jwt_required()
+def subscribe():
+    return render_template("subscribe.html", user=current_user)
