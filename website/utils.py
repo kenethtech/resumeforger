@@ -1,0 +1,48 @@
+import re
+from collections import Counter
+
+def extract_keywords(text):
+    #Define the stop words to ignore
+    stop_words = {'the', 'and', 'a', 'an', 'to', 'of', 'in', 'for', 'with', 'on', 'at', 'by', 'from', 'or', 'as', 'is', 'are', 'was', 'were', 'be', 'been', 'being'}
+
+    #clean and extract words
+    words = re.findall(r'\b\w+\b', text.lower())
+    keywords = [word for word in words if word not in stop_words and len(word) > 2]
+
+    return Counter(keywords)
+
+
+def calculate_ats_score(job_description, generated_content):
+    
+    if not job_description or not generated_content:
+        ats_score = 65
+        return ats_score
+    
+    job_keywords = extract_keywords(job_description)
+    content_keywords = extract_keywords(generated_content)
+
+    #top keywords from job description
+    top_job_keywords = [word for word, count in job_keywords.most_common(25)]
+
+    #calculate matches
+    matched_keywords = sum(1 for kw in top_job_keywords if kw in content_keywords)
+    total_important_keywords = len(top_job_keywords)
+
+    #base score 
+    keyword_match_score = (matched_keywords / max(total_important_keywords, 1)) * 60
+
+    bonus = 0
+    content_lower = generated_content.lower()
+
+    if "experience" in content_lower and "year" in content_lower:
+        bonus += 8
+    
+    if any(word in content_lower for word in ["led", "managed", "developed", "increased", "improved", "achieved"]):
+        bonus += 12
+    
+    if len(generated_content.split()) > 180 and len(generated_content.split()) < 650:
+        bonus += 10
+    
+    final_score = min(98, max(58, int(keyword_match_score + bonus)))
+
+    return final_score

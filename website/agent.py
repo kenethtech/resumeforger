@@ -1,15 +1,18 @@
 
-from flask import Blueprint, jsonify, request, render_template_string
+from flask import Blueprint, jsonify, make_response, request, render_template_string
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_login import login_required
 from langchain_groq import ChatGroq
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+
+from website.utils import calculate_ats_score
 from .config import Config
 from .models import Generation
 from . import db, limiter
 from website.templates.agent.export_pdf import (export_pdf_template)
 from .generate_pdf import generate_pdf
+from .generate_docx import create_docx_from_markdown
 import markdown
 
 
@@ -39,6 +42,7 @@ def generate_content():
         referees = data.get('referees', '')
         certifications = data.get('certifications', '')
         template_style = data.get('template_style', 'Professional')
+        projects = data.get('projects', '')
 
         llm = ChatGroq(
             model="llama-3.3-70b-versatile",
@@ -46,7 +50,7 @@ def generate_content():
             temperature=0.65
         )
         resume_prompt = PromptTemplate.from_template("""
-        You are a professional resume writer and career coach.
+        You are an expert resume writer specialized in ATS optimization.
                                                      
         Job Title: {job_title}
         Job Description: {job_description}
@@ -56,6 +60,7 @@ def generate_content():
         Phone Number: {phone_number}
         Education: {education}
         Certifications: {certifications}
+        Projects: {projects}
                 
         User Background: {user_background}
         Referees: {referees}
@@ -63,15 +68,16 @@ def generate_content():
         Document Type: {document_type}
         Template Style: {template_style}
                                                     
-        Create a highly tailored, ATS-friendly, and visually appealing {document_type} using the **{template_style}** style.
+        Create a **highly ATS-optimized** and visually appealing {document_type} using the **{template_style}** style with these rules:
+            - Use standard section headings: Professional Summary, Experience, Skills, Education, Projects
+            - Naturally incorporate exact keywords and phrases from the job description
+            - Use bullet points starting with strong action verbs
+            - Avoid tables, columns, text boxes, headers, footers, and special characters
+            - Spell out acronyms first (e.g., "Search Engine Optimization (SEO)")
+            - Keep it clean and professional
+            - Quantify achievements wherever possible
 
-        Key instructions:
-            - Match keywords from the job description
-            - Use strong action verbs and quantify achievements
-            - Follow the chosen template style strictly
-            - Keep it professional and impactful
-
-        Return only the final formatted document content."""
+        Return only the final formatted document content in markdown format."""
         )
 
         parser = StrOutputParser()
@@ -89,10 +95,11 @@ def generate_content():
             "document_type": document_type,
             "referees": referees,
             "certifications": certifications,
+            "projects": projects,
             "template_style": template_style
         })
 
-        score = 80
+        ats_score = calculate_ats_score(job_description, result)
 
         gen = Generation(
             user_id= current_user_id,
@@ -100,7 +107,7 @@ def generate_content():
             document_type= document_type,
             template_style= template_style,
             content= result,
-            ats_score= score
+            ats_score= ats_score
         )
         db.session.add(gen)
         db.session.commit()
@@ -110,6 +117,7 @@ def generate_content():
            'document_type': document_type,
            'job_title': job_title,
            'template_style': template_style,
+           'ats_score': ats_score
         })
 
     
@@ -183,11 +191,31 @@ def export_pdf():
         response = generate_pdf(html_template, document_type, job_title)
 
         return response
-
-
     
-
     except Exception as e:
         return jsonify({
             'error': str(e)
         })
+
+@agent.route('/export-docx', methods=['POST'])
+@limiter.limit("2 per minute") # Limit to 2 requests per minute
+@jwt_required()
+@login_required
+def export_docx():
+    try:
+        data = request.get_json()
+        content = data.get('content')
+        job_title = data.get('job_title', 'Resume')
+        document_type = data.get('document_type', 'Document')
+
+        if not content:
+            return jsonify({'error': 'No content provided'}), 405
+        
+        response = create_docx_from_markdown(content, document_type, job_title)
+
+        return response
+    
+    except Exception as e:
+        return jsonify({
+            'error': str(e)
+        }), 500
