@@ -1,4 +1,6 @@
 
+from operator import ge
+
 from flask import Blueprint, jsonify, make_response, request, render_template_string
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_login import login_required
@@ -214,6 +216,28 @@ def export_docx():
         response = create_docx_from_markdown(content, document_type, job_title)
 
         return response
+    
+    except Exception as e:
+        return jsonify({
+            'error': str(e)
+        }), 500
+
+@agent.route('/get-history')
+@jwt_required()
+def get_history():
+    try:
+        current_user = int(get_jwt_identity())
+        gen_history = Generation.query.filter_by(user_id=current_user).order_by(Generation.created_at.desc()).limit(20).all()
+
+        return jsonify([{
+        "id": g.id,
+        "job_title": g.job_title,
+        "document_type": g.document_type,
+        "template_style": g.template_style,
+        "ats_score": g.ats_score,
+        "created_at": g.created_at.isoformat(),
+        "content_preview": g.content[:180] + "..." if len(g.content) > 180 else g.content
+        } for g in gen_history]), 200
     
     except Exception as e:
         return jsonify({

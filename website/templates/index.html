@@ -43,7 +43,11 @@
         <h5>Welcome, <span class="fw-bold" id="user-email"></span></h5>
     </div>
     <h2 class="mb-4"> AI Resume and Cover builder</h2>
-    <div class="row">
+    <Ul class="nav nav-tabs mb-4">
+        <li class="nav-item"><button class="nav-link active" onclick="switchTab(0)">Create New</button></li>
+        <li class="nav-item"><button class="nav-link" onclick="switchTab(1)">History</button></li>
+    </Ul>
+    <div class="row" id="tab-create">
         <div class="col-lg-7">
             <div class="card shadow">
                 <div class="card-body">
@@ -179,9 +183,53 @@
 
         </div>
     </div>
+    <!---- Preview history-->
+    <div id="tab-history" style="display: none;">
+        <div class="card">
+            <div class="card-header">
+                <h5>Your Previous Generations</h5>
+            </div>
+            <div class="card-body" id="history-list" style="max-height: 600px; overflow-y: auto;">
+                <!--Generation from JS-->
+            </div>
+        </div>
+    </div>
+
 
 </div>
 <script>
+    function switchTab(n) {
+        document.getElementById('tab-create').style.display = n == 0 ? 'block' : 'none';
+        document.getElementById('tab-history').style.display = n == 1 ? 'block' : 'none';
+
+        if(n == 1){
+            loadHistory();
+        }
+    }
+
+    async function loadHistory() {
+        const res = await authFetch('/get-history');
+
+        const history = await res.json();
+
+        let html = '';
+
+        history.forEach(item => {
+            html += `
+                <div class="border-bottom pb-3 mb-3">
+                    <small class="text-muted">${new Date(item.created_at).toLocaleString()}</small><br>
+                    <strong>${item.document_type}</strong> — ${item.job_title}
+                    <span class="badge bg-secondary ms-2">${item.template_style}</span>
+                    <span class="badge bg-success ms-2">${item.ats_score}/100</span>
+                    <pre class="mt-2 small">${item.content_preview}</pre>
+                </div>`;
+        });
+
+        document.getElementById('history-list').innerHTML = html || '<p class="text-muted"> No Preview </p>'
+        
+    }
+
+
     const templatePreviews = {
     "Professional": `
       <div style="border: 1px solid #ddd; padding: 12px; border-radius: 6px; background: white;">
