@@ -29,9 +29,61 @@ def generate_content():
     try:
         current_user_id = int(get_jwt_identity())
         data = request.get_json()
+
+        llm = ChatGroq(
+            model="llama-3.3-70b-versatile",
+            groq_api_key=Config.GROQ_API_KEY,
+            temperature=0.65
+        )
         
         if not data:
             return jsonify({'error': 'Kindly fill all the fields'}), 401
+        
+        if data.get('document_type') != 'Resume':
+
+            cover_prompt_template = PromptTemplate.from_template("""
+            You are professional Career Coach and an expert Cover Letter writter.
+            Job Title: {job_title}
+            Job Description: {job_description}
+            
+            My Full Name: {full_name}
+                                                                 
+            Create a professional and visually appealing {document_type}.
+            
+            Return only the final formatted document content."""
+            )
+            parser_string = StrOutputParser()
+
+            llm_chain = cover_prompt_template | llm | parser_string
+
+            result_cover = llm_chain.invoke({
+                "job_title": data.get('job_title'),
+                "job_description": data.get('job_description'),
+                "full_name": data.get('full_name'),
+                "document_type": data.get('document_type')
+            })
+            ats_score_cover = calculate_ats_score(data.get('job_description'), result_cover)
+
+            generated_cover = Generation(
+                user_id=current_user_id,
+                job_title=data.get('job_title'),
+                document_type=data.get('document_type'),
+                template_style="Professional",
+                content=result_cover,
+                ats_score=ats_score_cover
+            )
+            db.session.add(generated_cover)
+            db.session.commit()
+
+            return jsonify({
+                "content": result_cover,
+                "document_type": data.get('document_type'),
+                "job_title": data.get('job_title'),
+                "template_style": 'Professional',
+                "ats_score": ats_score_cover
+            })
+        
+
         
         job_title = data['job_title']
         full_name = data['full_name']
@@ -46,11 +98,7 @@ def generate_content():
         template_style = data.get('template_style', 'Professional')
         projects = data.get('projects', '')
 
-        llm = ChatGroq(
-            model="llama-3.3-70b-versatile",
-            groq_api_key=Config.GROQ_API_KEY,
-            temperature=0.65
-        )
+        
         resume_prompt = PromptTemplate.from_template("""
         You are an expert resume writer specialized in ATS optimization.
                                                      
@@ -64,14 +112,14 @@ def generate_content():
         Certifications: {certifications}
         Projects: {projects}
                 
-        User Background: {user_background}
+        Experience: {user_background}
         Referees: {referees}
                             
         Document Type: {document_type}
         Template Style: {template_style}
                                                     
         Create a **highly ATS-optimized** and visually appealing {document_type} using the **{template_style}** style with these rules:
-            - Use standard section headings: Professional Summary, Experience, Skills, Education, Projects
+            - Use standard section headings: Professional Summary, Experience, Skills, Education, Projects, Referees
             - Naturally incorporate exact keywords and phrases from the job description
             - Use bullet points starting with strong action verbs
             - Avoid tables, columns, text boxes, headers, footers, and special characters

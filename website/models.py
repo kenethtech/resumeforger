@@ -1,3 +1,5 @@
+from sqlalchemy import Index
+
 from . import db
 from datetime import datetime, UTC
 from flask_login import UserMixin
@@ -7,8 +9,8 @@ from flask_login import UserMixin
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
 
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    id = db.Column(db.Integer, primary_key=True, index=True)
+    email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password = db.Column(db.String(120), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
     is_active_flag = db.Column(db.Boolean, default=True)
@@ -23,8 +25,8 @@ class User(db.Model, UserMixin):
 class Generation(db.Model):
     __tablename__ = 'generations'
 
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    id = db.Column(db.Integer, primary_key=True, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
     job_title = db.Column(db.String(50))
     document_type = db.Column(db.String(50))
     template_style = db.Column(db.String(50))
