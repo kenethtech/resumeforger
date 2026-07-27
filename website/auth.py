@@ -1,10 +1,12 @@
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, redirect, render_template, request, jsonify, url_for, flash
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity, set_access_cookies, set_refresh_cookies, unset_jwt_cookies
 from .models import User
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime, timedelta
 from . import db, limiter
-from flask_login import login_required, login_user, logout_user
+from flask_login import login_required, login_user, logout_user, current_user
+from .utils import send_reset_password_email
+
 
 auth = Blueprint('auth', __name__)
 
@@ -84,6 +86,7 @@ def refresh():
 
 @auth.route('/get-user', methods=['GET'])
 @jwt_required()
+@login_required
 def get_user():
    try:
         current_user_id = int(get_jwt_identity())
@@ -111,4 +114,50 @@ def logout():
     })
     unset_jwt_cookies(response)
     return response, 200
+
+@auth.route('/forget-password', methods=['POST'])
+def forget_password():
+    try:
+        if current_user.is_authenticated:
+            return redirect(url_for('views.home'))
+        data = request.get_json()
+        user = User.query.filter_by(email=data.get('email')).first()
+
+        if not user:
+            return jsonify({
+                "error":"The user with the email you have entered does not exist!"
+            })
+        
+        send_reset_password_email(user) #method for sending reset password instructions to user email
+        
+        return jsonify({"msg":"Kindly check your email for the password reset link!"})
+    
+    except Exception as e:
+        return jsonify({'error':'Password reset failed! Try again'})
+
+@auth.route('/request-reset-password/<token>/<int:user_id>', methods=['GET', 'POST']) #function to reset new password
+def request_reset_password(token, user_id):
+    if current_user.is_authenticated:
+        return redirect(url_for('views.home'))
+    
+    user = User.validate_reset_password_token(token, user_id) # Validate if the token and user id are correct
+
+    if not user:
+        flash("The password reset link has expired! Try again!")
+        return redirect(url_for('views.reset_password'))
+    
+    if request.method == 'POST':
+        new_password = request.form.get('new-password')
+        
+        user.set_password(new_password)
+        db.session.commit()
+
+        flash('Password reset successful. You can now login using your new password!')
+
+        return redirect(url_for('views.login_page'))
+    
+    
+
+    return render_template('request_reset_password.html', user=current_user, token=token, user_id=user_id)
+    
 

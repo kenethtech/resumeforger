@@ -11,6 +11,7 @@ from .config import Config
 from flask_login import LoginManager
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_mailman import Mail
 
 load_dotenv()  # Load environment variables from .env file
 
@@ -24,6 +25,7 @@ limiter = Limiter(
     default_limits=["200 per day", "50 per hour"],
     storage_uri=os.getenv("REDIS_URL")
 )
+email = Mail()
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -36,6 +38,7 @@ def create_app(config_class=Config):
     jwt.init_app(app)
     cache.init_app(app)
     limiter.init_app(app)
+    email.init_app(app)
 
     from .views import views
     from .auth import auth

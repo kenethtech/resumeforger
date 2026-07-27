@@ -1,5 +1,8 @@
+from flask_mailman import EmailMessage
 import re
 from collections import Counter
+from flask import jsonify, render_template_string, url_for
+from website.templates.auth.reset_password_template import ( reset_password_html_template )
 
 def extract_keywords(text):
     #Define the stop words to ignore
@@ -46,3 +49,28 @@ def calculate_ats_score(job_description, generated_content):
     final_score = min(98, max(58, int(keyword_match_score + bonus)))
 
     return final_score
+
+def send_reset_password_email(user):
+    try:
+        reset_password_url = url_for(
+        'auth.request_reset_password',
+        token = user.generate_reset_password_token(),
+        user_id = user.id,
+        _external = True
+        )
+
+        email_body = render_template_string(reset_password_html_template, reset_password_url=reset_password_url)
+        message = EmailMessage(
+            subject= "Reset Password",
+            body=email_body,
+            to= [user.email],
+        )
+        message.content_subtype = 'html'
+        message.send()
+
+    except Exception as e:
+        return jsonify({
+            "error": "Failed to send reset password instructions to your email!"
+        })
+
+

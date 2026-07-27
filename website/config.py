@@ -17,6 +17,16 @@ class Config:
     JWT_ACCESS_CSRF_HEADER_NAME='X-CSRF-TOKEN'
     JWT_REFRESH_CSRF_HEADER_NAME='X-CSRF-TOKEN'
     GROQ_API_KEY=os.getenv('GROQ_API_KEY')
+    RESET_TOKEN_MAX_AGE=int(os.getenv("RESET_TOKEN_MAX_AGE", 900))
+    MAIL_SERVER=os.getenv("MAIL_SERVER")
+    MAIL_PORT=int(os.getenv("MAIL_PORT") or 25)
+    MAIL_USE_TLS=bool(os.getenv("MAIL_USE_TLS"))
+    MAIL_USE_SSL=False
+    MAIL_USERNAME=os.getenv("MAIL_USERNAME")
+    MAIL_PASSWORD=os.getenv("MAIL_PASSWORD")
+    MAIL_DEFAULT_SENDER = (
+        os.getenv("MAIL_DEFAULT_SENDER") or "do-not-reply@pass-reset-resumeforger.com"
+    )
 
     if os.getenv('CACHE_REDIS_URL'):
         CACHE_TYPE = 'RedisCache'

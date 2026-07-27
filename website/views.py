@@ -32,3 +32,7 @@ def contact():
 @jwt_required()
 def subscribe():
     return render_template("subscribe.html", user=current_user)
+
+@views.route('/reset-password')
+def reset_password():
+    return render_template("reset_password.html", user=current_user)

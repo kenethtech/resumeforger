@@ -1,8 +1,10 @@
 from sqlalchemy import Index
-
+from werkzeug.security import generate_password_hash
 from . import db
 from datetime import datetime, UTC
 from flask_login import UserMixin
+from itsdangerous import URLSafeTimedSerializer, BadSignature,SignatureExpired
+from flask import current_app
 
 
 
@@ -21,6 +23,40 @@ class User(db.Model, UserMixin):
     @property
     def is_active(self):
         return self.is_active_flag
+
+    def set_password(self, new_pass:str): #A method for updating/setting new passwords
+        self.password = generate_password_hash(new_pass, method='pbkdf2:sha256')
+        return self.password
+    
+    def generate_reset_password_token(self):
+        serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+        return serializer.dumps(self.email, salt=self.password)
+    
+    @staticmethod
+    def validate_reset_password_token(token:str, user_id:int):
+
+        user = db.session.get(User, user_id)
+        if user is None:
+            return None
+        
+        serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+
+        try:
+            token_user_email = serializer.loads(
+                token,
+                max_age=current_app.config['RESET_TOKEN_MAX_AGE'],
+                salt=user.password
+            )
+        
+        except(BadSignature, SignatureExpired):
+            return None
+        
+        if token_user_email != user.email:
+            return None
+        
+        return user
+
+
 
 class Generation(db.Model):
     __tablename__ = 'generations'
