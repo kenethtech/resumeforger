@@ -1,4 +1,7 @@
-from sqlalchemy import Index
+from email.policy import default
+from time import timezone
+
+from sqlalchemy import Index, PrimaryKeyConstraint
 from werkzeug.security import generate_password_hash
 from . import db
 from datetime import datetime, UTC
@@ -16,9 +19,15 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(120), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
     is_active_flag = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.now(UTC))
+    created_at = db.Column(db.DateTime(timezone=True), default=datetime.now(UTC))
+
+    tier = db.Column(db.String(50), default='free') #free or premium tier
+    recharged_credits = db.Column(db.Integer, default=100) #free users are given 100 credits
+    credits_used = db.Column(db.Integer, default=0)
+    last_credit_reset = db.Column(db.DateTime(timezone=True), default=lambda:datetime.now(UTC))
 
     generations = db.relationship('Generation', backref='user', lazy=True, cascade='all, delete-orphan')
+    subscriptions = db.relationship('Subscription', backref='user', lazy=True, cascade='all, delete-orphan')
 
     @property
     def is_active(self):
@@ -71,3 +80,18 @@ class Generation(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now(UTC))
     deleted_at = db.Column(db.DateTime, nullable=True)
     is_deleted = db.Column(db.Boolean, default=False)
+
+class Subscription(db.Model):
+    __tablename__ = 'subscriptions'
+
+    id = db.Column(db.Integer, primary_key=True, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
+    tier = db.Column(db.String(50)) #free or premium tier
+    plan = db.Column(db.String(50)) # 1000 AI Credits /5000 /10000
+    remaining_credits = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime(timezone=True), default=lambda:datetime.now(UTC))
+
+    def is_active(self):
+        if not self.remaining_credits:
+            return False # free users return false
+        return self.remaining_credits >= 100 #Only return true  the users with more than 100 remaining credits

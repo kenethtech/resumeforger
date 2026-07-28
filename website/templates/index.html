@@ -17,7 +17,8 @@
     .d-none {
         display: none !important;
     }
-    .template-preview{
+
+    .template-preview {
         border: 2px solid #e5e7eb;
         border-radius: 8px;
         padding: 15px;
@@ -25,22 +26,28 @@
         background: white;
         margin-bottom: 7px;
     }
-    .template-preview.active{
+
+    .template-preview.active {
         border-color: #3b82f6;
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         margin-bottom: 7px;
     }
-    pre { 
-        background: #f8f9fa; 
-        padding: 20px; 
-        border-radius: 10px; 
-        white-space: pre-wrap; 
-        line-height: 1.6; 
-        }
+
+    pre {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        white-space: pre-wrap;
+        line-height: 1.6;
+    }
 </style>
 <div class="container py-5">
     <div>
         <h5>Welcome, <span class="fw-bold" id="user-email"></span></h5>
+        <p class="mb-0">
+            Plan: <strong id="user-tier">Free</strong> |
+            Credits Left: <strong id="credits-left">100</strong>
+        </p>
     </div>
     <h2 class="mb-4"> AI Resume and Cover builder</h2>
     <Ul class="nav nav-tabs mb-4">
@@ -116,7 +123,8 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="document_type">Document Type: </label>
-                            <select name="document_type" id="document_type" class="form-select" onchange="updateTemplateVisibility()">
+                            <select name="document_type" id="document_type" class="form-select"
+                                onchange="updateTemplateVisibility()">
                                 <option value="Resume">Resume</option>
                                 <option value="Cover Letter">Cover Letter</option>
                             </select>
@@ -124,7 +132,8 @@
 
                         <div class="col-md-6 mb-3">
                             <label for="template_style">Template Style: </label>
-                            <select name="template_style" id="template_style" class="form-select" onchange="updatePreview()">
+                            <select name="template_style" id="template_style" class="form-select"
+                                onchange="updatePreview()">
                                 <option value="Professional">Professional</option>
                                 <option value="Creative">Creative</option>
                                 <option value="Modern">Modern</option>
@@ -137,10 +146,10 @@
                         </div>
                     </div>
                     <!-- Preview Template-->
-                     <div class="mt-4">
+                    <div class="mt-4">
                         <label for="preview-box" class="form-label">Resume Template Preview: </label>
                         <div id="preview-box" class="template-preview"></div>
-                     </div>
+                    </div>
 
 
                     <button onclick="generateDocument()" class="btn btn-primary w-100 py-3" id="generate-btn">
@@ -168,7 +177,8 @@
                     <!---ATS Score--->
                     <div class="mt-3 p-3 bg-light rounded">
                         <strong>ATS Score: <span id="ats-score" class="text-success"></span>%</strong>
-                        <small class="text-muted d-block">The higher the score, the better your resume will perform on ATS systems</small>
+                        <small class="text-muted d-block">The higher the score, the better your resume will perform on
+                            ATS systems</small>
                     </div>
                 </div>
             </div>
@@ -202,7 +212,7 @@
         document.getElementById('tab-create').style.display = n == 0 ? 'block' : 'none';
         document.getElementById('tab-history').style.display = n == 1 ? 'block' : 'none';
 
-        if(n == 1){
+        if (n == 1) {
             loadHistory();
         }
     }
@@ -226,12 +236,12 @@
         });
 
         document.getElementById('history-list').innerHTML = html || '<p class="text-muted"> No Preview </p>'
-        
+
     }
 
 
     const templatePreviews = {
-    "Professional": `
+        "Professional": `
       <div style="border: 1px solid #ddd; padding: 12px; border-radius: 6px; background: white;">
         <div style="text-align:center; margin-bottom: 12px;">
           <strong style="color:#1e3a8a;">JOHN DOE</strong><br>
@@ -245,7 +255,7 @@
         </div>
       </div>`,
 
-    "Modern": `
+        "Modern": `
       <div style="border-left: 5px solid #0ea5e9; padding: 12px; background: white;">
         <strong style="color:#0369a1;">JOHN DOE</strong><br>
         <small>Senior Product Manager</small><br><br>
@@ -253,7 +263,7 @@
         • Built and scaled product from 0 to 10k users
       </div>`,
 
-    "Executive": `
+        "Executive": `
       <div style="text-align:center; border-bottom: 3px solid #1e2937; padding-bottom: 8px;">
         <strong style="font-size:1.1rem;">JOHN DOE</strong><br>
         <small>CHIEF TECHNOLOGY OFFICER</small>
@@ -262,7 +272,7 @@
         Strategic leadership • Digital transformation
       </div>`,
 
-    "Creative": `
+        "Creative": `
       <div style="background: linear-gradient(135deg, #7c3aed, #c026d3); color:white; padding:12px; border-radius:8px;">
         <strong>JOHN DOE</strong><br>
         <small>Creative Director & Designer</small>
@@ -271,7 +281,7 @@
         "Crafting digital experiences that matter"
       </div>`,
 
-    "Minimalist": `
+        "Minimalist": `
       <div style="font-size:0.9rem; line-height:1.8;">
         <strong>JOHN DOE</strong><br>
         Software Engineer<br><br>
@@ -279,27 +289,27 @@
         • Company A — 2022-Present
       </div>`,
 
-    "Technical": `
+        "Technical": `
       <div style="font-family:monospace; background:#f1f5f9; padding:12px; border-radius:6px;">
         <strong>JOHN DOE</strong><br>
         Backend Engineer<br><br>
         Tech Stack: Python • Django • AWS
       </div>`,
 
-    "Compact": `
+        "Compact": `
       <div style="font-size:0.85rem;">
         <strong>JOHN DOE</strong> | Senior Engineer<br>
         • Led team of 8 • Delivered 12 projects • AWS Certified
       </div>`,
 
-    "Bold": `
+        "Bold": `
       <div style="background:#1e3a8a; color:white; padding:15px; text-align:center; border-radius:8px;">
         <strong>JOHN DOE</strong><br>
         <small>TRANSFORMING BUSINESSES THROUGH TECHNOLOGY</small>
       </div>`
-  };
+    };
 
-    function updatePreview(){
+    function updatePreview() {
         const style = document.getElementById('template_style').value;
         const previewBox = document.getElementById('preview-box');
 
@@ -317,13 +327,13 @@
 
         if (documentType === 'Resume') {
             document.getElementById('preview-box').parentElement.style.display = 'block';
-            
-           
+
+
         } else {
             document.getElementById('preview-box').parentElement.style.display = 'none';
-            
 
-           
+
+
         }
     }
 
@@ -341,6 +351,8 @@
                 return;
             }
             document.getElementById('user-email').textContent = user.email;
+            document.getElementById('credits-left').textContent = user.credits_remaining;
+            document.getElementById('user-tier').textContent = user.plan;
 
         } catch (e) {
             console.error(e);
@@ -390,18 +402,18 @@
             if (res.ok) {
                 document.getElementById('result-content').textContent = data.content;
                 document.getElementById('result-title').textContent = `${data.document_type} - ${data.job_title} (${data.template_style} Style)`;
-                
+
 
                 const score = document.getElementById('ats-score');
                 score.textContent = data.ats_score ? data.ats_score : 'N/A';
 
-                if (data.ats_score >= 80){
+                if (data.ats_score >= 80) {
                     score.className = 'text-success fw-bold';
                 }
-                else if (data.ats_score >=70){
+                else if (data.ats_score >= 70) {
                     score.className = 'text-warning fw-bold';
                 }
-                else{
+                else {
                     score.className = 'text-danger fw-bold';
                 }
 

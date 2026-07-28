@@ -2,7 +2,7 @@ from flask import Blueprint, redirect, render_template, request, jsonify, url_fo
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity, set_access_cookies, set_refresh_cookies, unset_jwt_cookies
 from .models import User
 from werkzeug.security import check_password_hash, generate_password_hash
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from . import db, limiter
 from flask_login import login_required, login_user, logout_user, current_user
 from .utils import send_reset_password_email
@@ -91,12 +91,24 @@ def get_user():
    try:
         current_user_id = int(get_jwt_identity())
         user = User.query.filter_by(id=current_user_id).first()
+
+        if user.tier == None:
+            user.tier = 'free'
+            user.recharged_credits = 100
+            user.credits_used = 0
+            user.last_credit_reset = datetime.now(UTC)
+            db.session.commit()
+
+        credits_remaining = user.recharged_credits - user.credits_used or 0
+
         if not user:
             return jsonify({
                 'error': 'Unable to fetch user profile'
             }), 404
         return jsonify({
-            'email': user.email
+            'email': user.email,
+            'credits_remaining': credits_remaining,
+            'plan': user.tier
         }), 200
    
    except Exception as e:
