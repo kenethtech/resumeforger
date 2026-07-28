@@ -3,6 +3,138 @@
 {% block title %}Subscribe{% endblock %}
 
 {% block content %}
-    <h1>Subscribe</h1>
-    <p>Thank you for subscribing.</p>
+<div class="container py-4">
+    <div class="card shadow">
+        <div class="card-body">
+            <h2 class="text-center mb-5">Upgrade to Pro</h2>
+
+            <div class="row g-4 justify-content-center">
+
+                <!-- 1000 AI credits Plan -->
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm text-center">
+                        <div class="card-header">
+                            <h4 class="my-0">Recharge 1,000 AI Credits</h4>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h1 class="card-title">
+                                $10 <small class="text-muted">/ 1,000 AI Credits</small>
+                            </h1>
+
+                            <ul class="list-unstyled mt-3 mb-4">
+                                <li>1,000 of AI Credits</li>
+                                <li>Premium AI Resume and Cover Letter</li>
+                                <li>Priority customer support</li>
+                            </ul>
+
+                            <button type="button" class="btn btn-outline-primary w-100 mt-auto" data-bs-toggle="modal"
+                                data-bs-target="#1000CreditsModal">
+                                Subscribe Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5000 AI Credits Plan -->
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm text-center border-primary">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="my-0">Recharge 5,000 AI Credits</h4>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h1 class="card-title">
+                                $50 <small class="text-muted">/ 5,000 AI Credits</small>
+                            </h1>
+
+                            <ul class="list-unstyled mt-3 mb-4">
+                                <li>5,000 AI Credits</li>
+                                <li>Generate even Resume and Cover letters with Advance models</li>
+                                <li>Priority customer support</li>
+                            </ul>
+
+                            <button type="button" class="btn btn-primary w-100 mt-auto" data-bs-toggle="modal"
+                                data-bs-target="#5000CreditsModal">
+                                Subscribe Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 10,000 Plan -->
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm text-center">
+                        <div class="card-header">
+                            <h4 class="my-0">Recharge 10,000 AI Credits</h4>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h1 class="card-title">
+                                $100 <small class="text-muted">/ 10,000 AI Credits</small>
+                            </h1>
+
+                            <ul class="list-unstyled mt-3 mb-4">
+                                <li>10,000 AI Credits</li>
+                                <li>Generate over 100 Resume and Cover Letters with Advance Models</li>
+                                <li>Priority customer support</li>
+                            </ul>
+
+                            <button type="button" class="btn btn-outline-primary w-100 mt-auto" data-bs-toggle="modal"
+                                data-bs-target="#10000CreditsModal">
+                                Subscribe Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="1000CreditsModal" tabindex="-1" aria-labelledby="1000CreditsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="1000CreditsModalLabel">1,000 AI Credits</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>To Recharge 1,000 AI Credits, please click the button below to proceed with payment.</p>
+                    <strong>Pay: $10</strong>
+                    <div id="paypal-monthly"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="5000CreditsModal" tabindex="-1" aria-labelledby="5000CreditsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="5000CreditsModalLabel">5,000 AI Credits</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>To Recharge 5,000 AI Credits, please click the button below to proceed with payment.</p>
+                    <strong>Pay: $50</strong>
+                    <div id="paypal-three-month"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="10000CreditsModal" tabindex="-1" aria-labelledby="10000CreditsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="10000CreditsModalLabel">10,000 AI Credits</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>To Recharge 10,000 AI Credits, please click the button below to proceed with payment.</p>
+                    <strong>Pay: $100</strong>
+                    <div id="paypal-yearly"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
