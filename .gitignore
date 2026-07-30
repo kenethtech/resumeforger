@@ -6,7 +6,7 @@ dist/
 wheels/
 *.egg-info
 
-migrations
+
 instance
 resumeforger_db.db
 
