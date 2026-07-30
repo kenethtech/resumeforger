@@ -71,7 +71,7 @@ class Generation(db.Model):
     __tablename__ = 'generations'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     job_title = db.Column(db.String(50))
     document_type = db.Column(db.String(50))
     template_style = db.Column(db.String(50))
@@ -85,7 +85,7 @@ class Subscription(db.Model):
     __tablename__ = 'subscriptions'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     tier = db.Column(db.String(50)) #free or premium tier
     plan = db.Column(db.String(50)) # 1000 AI Credits /5000 /10000
     remaining_credits = db.Column(db.Integer, default=0)
