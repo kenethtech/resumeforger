@@ -21,10 +21,10 @@ class User(db.Model, UserMixin):
     is_active_flag = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime(timezone=True), default=datetime.now(UTC))
 
-    tier = db.Column(db.String(50), default='free') #free or premium tier
-    recharged_credits = db.Column(db.Integer, default=100) #free users are given 100 credits
-    credits_used = db.Column(db.Integer, default=0)
-    last_credit_reset = db.Column(db.DateTime(timezone=True), default=lambda:datetime.now(UTC))
+    tiers = db.Column(db.String(50), default='free') #free or premium tier
+    credits = db.Column(db.Integer, default=100) #free users are given 100 credits
+    credits_consumed = db.Column(db.Integer, default=0)
+    last_reset_credit = db.Column(db.DateTime(timezone=True), default=lambda:datetime.now(UTC))
 
     generations = db.relationship('Generation', backref='user', lazy=True, cascade='all, delete-orphan')
     subscriptions = db.relationship('Subscription', backref='user', lazy=True, cascade='all, delete-orphan')
