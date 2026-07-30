@@ -92,14 +92,7 @@ def get_user():
         current_user_id = int(get_jwt_identity())
         user = User.query.filter_by(id=current_user_id).first()
 
-        if user.tier == None:
-            user.tier = 'free'
-            user.recharged_credits = 100
-            user.credits_used = 0
-            user.last_credit_reset = datetime.now(UTC)
-            db.session.commit()
-
-        credits_remaining = user.recharged_credits - user.credits_used or 0
+        credits_remaining = 0
 
         if not user:
             return jsonify({
@@ -108,7 +101,7 @@ def get_user():
         return jsonify({
             'email': user.email,
             'credits_remaining': credits_remaining,
-            'plan': user.tier
+            'plan': 'free'
         }), 200
    
    except Exception as e:
