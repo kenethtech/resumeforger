@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-flask --app main db migrate
+flask --app main db stamp head
 
 flask --app main db upgrade
 
