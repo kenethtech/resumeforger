@@ -14,13 +14,19 @@ from flask import current_app
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
 
-    id = db.Column(db.Integer, primary_key=True, index=True)
+    id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password = db.Column(db.String(120), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
     is_active_flag = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime(timezone=True), default=datetime.now(UTC))
 
+    tier = db.Column(db.String(50), default='free') #free or premium tier
+    recharged_credits = db.Column(db.Integer, default=100) #free users are given 100 credits
+    credits_used = db.Column(db.Integer, default=0)
+    last_credit_reset = db.Column(db.DateTime(timezone=True), default=lambda:datetime.now(UTC))
+
+    generations = db.relationship('Generation', backref='user', lazy=True, cascade='all, delete-orphan')
     subscriptions = db.relationship('Subscription', backref='user', lazy=True, cascade='all, delete-orphan')
 
     @property
@@ -64,7 +70,7 @@ class User(db.Model, UserMixin):
 class Generation(db.Model):
     __tablename__ = 'generations'
 
-    id = db.Column(db.Integer, primary_key=True, index=True)
+    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
     job_title = db.Column(db.String(50))
     document_type = db.Column(db.String(50))
@@ -78,7 +84,7 @@ class Generation(db.Model):
 class Subscription(db.Model):
     __tablename__ = 'subscriptions'
 
-    id = db.Column(db.Integer, primary_key=True, index=True)
+    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
     tier = db.Column(db.String(50)) #free or premium tier
     plan = db.Column(db.String(50)) # 1000 AI Credits /5000 /10000
