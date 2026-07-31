@@ -399,6 +399,15 @@
 
             const data = await res.json();
 
+            if (data.error){
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = `<i class="fa fa-magic"></i> Generate with AI`;
+                hideLoading();
+
+                alert(data.error || "Generation failed!");
+                return;
+            }
+
             if (res.ok) {
                 document.getElementById('result-content').textContent = data.content;
                 document.getElementById('result-title').textContent = `${data.document_type} - ${data.job_title} (${data.template_style} Style)`;

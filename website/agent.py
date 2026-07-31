@@ -8,9 +8,9 @@ from langchain_groq import ChatGroq
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
-from website.utils import calculate_ats_score
+from website.utils import calculate_ats_score, reset_credits_if_needed
 from .config import Config
-from .models import Generation
+from .models import Generation, User
 from . import db, limiter
 from website.templates.agent.export_pdf import (export_pdf_template)
 from .generate_pdf import generate_pdf
@@ -28,6 +28,15 @@ agent = Blueprint('agent', __name__)
 def generate_content():
     try:
         current_user_id = int(get_jwt_identity())
+        user = User.query.filter_by(id=current_user_id).first()
+        reset_credits_if_needed(user)
+        db.session.commit()
+
+        if user.credits_consumed >= user.credits: #checks if the user has enough credits, for both free and premium users
+            return jsonify({
+                'error': "You don't have enough credits! Kindly Subscribe to premium"
+            }), 400
+        
         data = request.get_json()
 
         llm = ChatGroq(
@@ -73,6 +82,7 @@ def generate_content():
                 ats_score=ats_score_cover
             )
             db.session.add(generated_cover)
+            user.credits_consumed = (user.credits_consumed or 0) + 100 
             db.session.commit()
 
             return jsonify({
@@ -160,6 +170,7 @@ def generate_content():
             ats_score= ats_score
         )
         db.session.add(gen)
+        user.credits_consumed = (user.credits_consumed or 0) + 100 
         db.session.commit()
 
         return jsonify({

@@ -3,6 +3,7 @@ import re
 from collections import Counter
 from flask import jsonify, render_template_string, url_for
 from website.templates.auth.reset_password_template import ( reset_password_html_template )
+from datetime import datetime, UTC, tzinfo
 
 def extract_keywords(text):
     #Define the stop words to ignore
@@ -72,5 +73,17 @@ def send_reset_password_email(user):
         return jsonify({
             "error": "Failed to send reset password instructions to your email!"
         })
+
+def reset_credits_if_needed(user):
+    now = datetime.now(UTC)
+    last_reset = user.last_reset_credit
+
+    if last_reset.tzinfo is None:
+        last_reset = last_reset.replace(tzinfo=UTC)
+
+    if user.tiers == 'free' and (now - last_reset).days >= 30:
+        user.credits = 100
+        user.credits_consumed = 0
+        user.last_reset_credit = now
 
 
