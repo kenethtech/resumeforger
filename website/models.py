@@ -28,6 +28,7 @@ class User(db.Model, UserMixin):
 
     generations = db.relationship('Generation', backref='user', lazy=True, cascade='all, delete-orphan')
     subscriptions = db.relationship('Subscription', backref='user', lazy=True, cascade='all, delete-orphan')
+    payments = db.relationship('Payment', backref='user', lazy=True, cascade='all, delete-orphan')
 
     @property
     def is_active(self):
@@ -95,3 +96,14 @@ class Subscription(db.Model):
         if not self.remaining_credits:
             return False # free users return false
         return self.remaining_credits >= 100 #Only return true  the users with more than 100 remaining credits
+
+class Payment(db.Model):
+    __tablename__ = 'payments'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    payment_method = db.Column(db.String(50), nullable=False)
+    transaction_id = db.Column(db.String(100), unique=True)
+    status = db.Column(db.String(50), nullable=False)
+    created_at = db.Column(db.DateTime(timezone=True), default=lambda:datetime.now(UTC))

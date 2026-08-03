@@ -98,7 +98,7 @@
                 <div class="modal-body">
                     <p>To Recharge 1,000 AI Credits, please click the button below to proceed with payment.</p>
                     <strong>Pay: $10</strong>
-                    <div id="paypal-monthly"></div>
+                    <div id="paypal-one-thousand"></div>
                 </div>
             </div>
         </div>
@@ -115,7 +115,7 @@
                 <div class="modal-body">
                     <p>To Recharge 5,000 AI Credits, please click the button below to proceed with payment.</p>
                     <strong>Pay: $50</strong>
-                    <div id="paypal-three-month"></div>
+                    <div id="paypal-five-thousand"></div>
                 </div>
             </div>
         </div>
@@ -131,10 +131,112 @@
                 <div class="modal-body">
                     <p>To Recharge 10,000 AI Credits, please click the button below to proceed with payment.</p>
                     <strong>Pay: $100</strong>
-                    <div id="paypal-yearly"></div>
+                    <div id="paypal-ten-thousand"></div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD"></script>
+<script>
+    paypal.Buttons({
+    createOrder: function() {
+        return authFetch('/create-order/one-thousand-credits', {
+            method: 'POST'
+        })
+        .then(res => res.json())
+        .then(data => data.id);
+    },
+
+    onApprove: function(data) {
+        console.log("Paypal OrderID:", data.orderID);
+        
+        return authFetch('/capture-order', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                orderID: data.orderID,
+                plan: 'one-thousand-credits'
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "success") {
+                alert("Payment successful! Redirecting to homepage...");
+                window.location.href = "/";
+            } else {
+                alert("Payment failed");
+            }
+        });
+    }
+
+}).render('#paypal-one-thousand');
+
+paypal.Buttons({
+    createOrder: function() {
+        return authFetch('/create-order/five-thousand-credits', {
+            method: 'POST'
+        })
+        .then(res => res.json())
+        .then(data => data.id);
+    },
+
+    onApprove: function(data) {
+        console.log("Paypal OrderID:", data.orderID);
+        
+        return authFetch('/capture-order', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                orderID: data.orderID,
+                plan: 'five-thousand-credits'
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "success") {
+                alert("Payment successful! Redirecting to homepage...");
+                window.location.href = "/";
+            } else {
+                alert("Payment failed");
+            }
+        });
+    }
+
+}).render('#paypal-five-thousand');
+
+paypal.Buttons({
+    createOrder: function() {
+        return authFetch('/create-order/ten-thousand-credits', {
+            method: 'POST'
+        })
+        .then(res => res.json())
+        .then(data => data.id);
+    },
+
+    onApprove: function(data) {
+        console.log("Paypal OrderID:", data.orderID);
+        
+        return authFetch('/capture-order', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                orderID: data.orderID,
+                plan: 'ten-thousand-credits'
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "success") {
+                alert("Payment successful! Redirecting to homepage...");
+                window.location.href = "/";
+            } else {
+                alert("Payment failed");
+            }
+        });
+    }
+
+}).render('#paypal-ten-thousand');
+</script>
+
 {% endblock %}

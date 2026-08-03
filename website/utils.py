@@ -4,6 +4,8 @@ from collections import Counter
 from flask import jsonify, render_template_string, url_for
 from website.templates.auth.reset_password_template import ( reset_password_html_template )
 from datetime import datetime, UTC, tzinfo
+from . import db
+from .models import Subscription
 
 def extract_keywords(text):
     #Define the stop words to ignore
@@ -85,5 +87,23 @@ def reset_credits_if_needed(user):
         user.credits = 100
         user.credits_consumed = 0
         user.last_reset_credit = now
+
+def create_user_subscription(user, plan):
+    credits_plans ={
+                'one-thousand-credits': 1000,
+                'five-thousand-credits': 5000,
+                'ten-thousand-credits': 10000
+            }
+    if user.subscriptions: #Delete existing subscription if any
+        db.session.delete(user.subscriptions)
+
+    new_subscription = Subscription(
+        user_id=user.id,
+        tier='premium',
+        plan=plan,
+        remaining_credits=credits_plans[plan]
+
+    )
+    db.session.add(new_subscription)
 
 

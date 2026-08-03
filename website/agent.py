@@ -1,5 +1,5 @@
 
-from operator import ge
+from operator import ge, is_
 
 from flask import Blueprint, jsonify, make_response, request, render_template_string
 from flask_jwt_extended import get_jwt_identity, jwt_required
@@ -10,7 +10,7 @@ from langchain_core.output_parsers import StrOutputParser
 
 from website.utils import calculate_ats_score, reset_credits_if_needed
 from .config import Config
-from .models import Generation, User
+from .models import Generation, User, Subscription
 from . import db, limiter
 from website.templates.agent.export_pdf import (export_pdf_template)
 from .generate_pdf import generate_pdf
@@ -31,6 +31,8 @@ def generate_content():
         user = User.query.filter_by(id=current_user_id).first()
         reset_credits_if_needed(user)
         db.session.commit()
+
+        subscription = Subscription.query.filter_by(user_id=current_user_id).first() or None
 
         if user.credits_consumed >= user.credits: #checks if the user has enough credits, for both free and premium users
             return jsonify({
@@ -83,6 +85,8 @@ def generate_content():
             )
             db.session.add(generated_cover)
             user.credits_consumed = (user.credits_consumed or 0) + 100 
+            if subscription.is_active:
+                subscription.remaining_credits = max(subscription.remaining_credits - 100, 0)
             db.session.commit()
 
             return jsonify({
@@ -171,6 +175,8 @@ def generate_content():
         )
         db.session.add(gen)
         user.credits_consumed = (user.credits_consumed or 0) + 100 
+        if subscription.is_active:
+            subscription.remaining_credits = max(subscription.remaining_credits - 100, 0)
         db.session.commit()
 
         return jsonify({

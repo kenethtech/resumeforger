@@ -40,15 +40,15 @@
                     <li class="nav-item">
                         <a type="button" class="nav-link" onclick="logout()">Logout</a>
                     </li>
-                    {% if not user.subscriptions or not user.subscriptions.is_active %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/subscribe">Go Premium</a>
-                    </li>
-                    {% else %}
+                        {% if user.subscriptions or user.subscriptions.is_active %}
                     <li class="nav-item">
                         <a class="nav-link btn btn-danger" href="#">Premium Active</a>
                     </li>
-                    {% endif %}
+                        {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/subscribe">Go Premium</a>
+                    </li>
+                        {% endif %}
 
                     {% else %}
                     <li class="nav-item">

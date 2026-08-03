@@ -1,6 +1,11 @@
-from flask import Blueprint, render_template, redirect, url_for
-from flask_jwt_extended import jwt_required
+from flask import Blueprint, flash, render_template, redirect, url_for
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_login import current_user, login_required
+from .models import Subscription
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 views = Blueprint('views', __name__)
 
@@ -23,6 +28,7 @@ def signup():
 def about():
     return render_template('about.html', user=current_user)
 
+
 @views.route("/contact")
 def contact():
     return render_template("contact.html", user=current_user)
@@ -31,7 +37,12 @@ def contact():
 @login_required
 @jwt_required()
 def subscribe():
-    return render_template("subscribe.html", user=current_user)
+    subscription = Subscription.query.filter_by(user_id=current_user.id).first()
+    if current_user.subscriptions and subscription.is_active:
+        flash("You already have an active subscription.", "info")
+        return redirect(url_for('views.home'))
+    paypal_client_id = os.getenv('PAYPAL_CLIENT_ID')
+    return render_template("subscribe.html", user=current_user, paypal_client_id=paypal_client_id)
 
 @views.route('/reset-password')
 def reset_password():
