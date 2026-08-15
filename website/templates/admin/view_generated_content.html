@@ -1,0 +1,39 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Generated Content{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>View Generated Content</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Job Title</th>
+                <th>Document Type</th>
+                <th>Template Style</th>
+                <th>Content</th>
+                <th>ATS Score</th>
+                <th>Date Generated</th>
+                <th>ATS Score</th>
+                <th>Is Deleted</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for generation in generations %}
+            <tr>
+                <td>{{ generation.user_id }}</td>
+                <td>{{ generation.job_title }}</td>
+                <td>{{ generation.document_type }}</td>
+                <td>{{ generation.template_style }}</td>
+                <td>{{ generation.content[:150] }}</td>
+                <td>{{ generation.ats_score }}</td>
+                <td>{{ generation.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                <td>{{ generation.ats_score }}</td>
+                <td>{{ generation.is_deleted }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

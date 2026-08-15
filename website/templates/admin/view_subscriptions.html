@@ -1,0 +1,31 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}View Subscriptions{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>View Subscriptions</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Tier</th>
+                <th>Subscription Date</th>
+                <th>Plan</th>
+                <th>Remaining Credits</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for subscription in subscriptions %}
+            <tr>
+                <td>{{ subscription.user_id }}</td>
+                <td>{{ subscription.tier }}</td>
+                <td>{{ subscription.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                <td>{{ subscription.plan }}</td>
+                <td>{{ subscription.remaining_credits }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

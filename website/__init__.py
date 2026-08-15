@@ -44,11 +44,13 @@ def create_app(config_class=Config):
     from .auth import auth
     from .agent import agent
     from .paypal_payments import paypal_payments
+    from .admin import admin
 
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
     app.register_blueprint(agent, url_prefix='/')
     app.register_blueprint(paypal_payments, url_prefix='/')
+    app.register_blueprint(admin, url_prefix='/admin')
 
 
     with app.app_context():
