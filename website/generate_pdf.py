@@ -2,6 +2,7 @@ from playwright.sync_api import sync_playwright
 import tempfile
 import os
 from flask import make_response
+import re
 
 
 def generate_pdf(html_template, document_type, job_title):
@@ -30,10 +31,11 @@ def generate_pdf(html_template, document_type, job_title):
         
         with open(pdf_path, 'rb') as f:
             pdf = f.read()
-        
+
+        safe_job_title = re.sub(r'[<>:"/\\|?*]',"_", job_title)
         response = make_response(pdf)
         response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = f'attachment; filename="{document_type}_{job_title}.pdf"'
+        response.headers['Content-Disposition'] = f'attachment; filename="{document_type}_{safe_job_title.replace(" ", "_")}.pdf"'
         
         return response
     
