@@ -24,7 +24,7 @@ def get_paypal_client():
                 o_auth_client_id=os.getenv("PAYPAL_CLIENT_ID"),
                 o_auth_client_secret=os.getenv("PAYPAL_CLIENT_SECRET")
             ),
-            environment= Environment.SANDBOX,
+            environment= Environment.PRODUCTION,
             logging_configuration= LoggingConfiguration(
                 log_level= logging.INFO,
                 request_logging_config= RequestLoggingConfiguration(
