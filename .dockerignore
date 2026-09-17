@@ -11,3 +11,4 @@ instance
 # Virtual environments
 .venv
 .env
+.vscode

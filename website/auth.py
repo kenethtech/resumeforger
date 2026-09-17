@@ -6,7 +6,7 @@ from datetime import UTC, datetime, timedelta
 from . import db, limiter
 from flask_login import login_required, login_user, logout_user, current_user
 from .utils import send_reset_password_email, reset_credits_if_needed
-
+from .sub_model import UserLogin, UserRegistration
 
 auth = Blueprint('auth', __name__)
 
@@ -14,11 +14,13 @@ auth = Blueprint('auth', __name__)
 @auth.route('/token', methods=['POST'])
 @limiter.limit("3 per minute")
 def login():
+    user_data = request.get_json()
     try:
-        data = request.get_json()
-        user = User.query.filter_by(email=data.get('email')).first()
+        data = UserLogin(**user_data)
+        
+        user = User.query.filter_by(email=data.email).first()
 
-        if not user or not check_password_hash(user.password, data.get('password')):
+        if not user or not check_password_hash(user.password, data.password):
             return jsonify({'error': 'Wrong email or password!'}),400
         
         if not user.is_active:
@@ -43,30 +45,28 @@ def login():
 @auth.route('/register', methods=['POST'])
 @limiter.limit("3 per minute")
 def register():
+    user_data = request.get_json()
     try:
         
-        data = request.get_json()
-
-        if not data:
-            return jsonify({'error': 'No data provided!'}),400
-        user = User.query.filter_by(email=data.get('email')).first()
+        data = UserRegistration(**user_data)
+        user = User.query.filter_by(email=data.email).first()
 
         if user:
             return jsonify({'error': 'The user with the entered email already exist!'}),401
-        if not data.get('email') or not data.get('password'):
+        """if not data.get('email') or not data.get('password'):
             return jsonify({'error': 'email and password are required!'}),402
         if data.get('password') != data.get('confirmPassword'):
-            return jsonify({'error': 'password mismatch!'}) ,403
+            return jsonify({'error': 'password mismatch!'}) ,403"""
             
-        hashed_password = generate_password_hash(data.get('password'), method='pbkdf2:sha256')
+        hashed_password = generate_password_hash(data.password, method='pbkdf2:sha256')
 
-        new_user = User(email=data.get('email'), password=hashed_password) 
+        new_user = User(email=data.email, password=hashed_password) 
         db.session.add(new_user)
         db.session.commit()
 
         return jsonify({
             'msg': 'user successfully registered, login to proceed!'
-        }),201
+        }),200
         
     except Exception as e:
         db.session.rollback()

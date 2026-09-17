@@ -32,7 +32,7 @@ def generate_content():
         reset_credits_if_needed(user)
         db.session.commit()
 
-        subscription = Subscription.query.filter_by(user_id=current_user_id).first() or None
+        subscription = Subscription.query.filter_by(user_id=current_user_id).first()
 
         if user.credits_consumed >= user.credits: #checks if the user has enough credits, for both free and premium users
             return jsonify({
@@ -85,7 +85,7 @@ def generate_content():
             )
             db.session.add(generated_cover)
             user.credits_consumed = (user.credits_consumed or 0) + 100 
-            if subscription.is_active:
+            if subscription != None and subscription.is_active:
                 subscription.remaining_credits = max(subscription.remaining_credits - 100, 0)
             db.session.commit()
 
@@ -175,7 +175,7 @@ def generate_content():
         )
         db.session.add(gen)
         user.credits_consumed = (user.credits_consumed or 0) + 100 
-        if subscription.is_active:
+        if subscription != None and subscription.is_active:
             subscription.remaining_credits = max(subscription.remaining_credits - 100, 0)
         db.session.commit()
 

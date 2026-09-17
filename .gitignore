@@ -14,3 +14,4 @@ resumeforger_db.db
 .venv
 .env
 instance
+.vscode
