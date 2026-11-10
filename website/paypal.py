@@ -18,7 +18,7 @@ load_dotenv()
 )
 def get_paypal_client():
     try:
-         
+        
         client = PaypalServersdkClient(
             client_credentials_auth_credentials= ClientCredentialsAuthCredentials(
                 o_auth_client_id=os.getenv("PAYPAL_CLIENT_ID"),
